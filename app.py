@@ -175,11 +175,11 @@ def main():
                                 max_value = range_values.get('max', None)
                                 if min_value is not None and min_value != 0:
                                     # Generate a separate query for the MIN value
-                                    query = f"INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) VALUES ('{min_value}', '{column_name}', '{range_type.upper()}', '{order_name}', current_date(), NULL, NULL);"
+                                    query = f"INSERT INTO delivery_schema._sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) VALUES ('{min_value}', '{column_name}', '{range_type.upper()}', '{order_name}', current_date(), NULL, NULL);"
                                     queries.append(query)
                                 if max_value is not None and max_value != 0:
                                     # Generate a separate query for the MAX value
-                                    query = f"INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) VALUES ('{max_value}', '{column_name}', '{range_type.upper()}', '{order_name}', current_date(), NULL, NULL);"
+                                    query = f"INSERT INTO delivery_schema._sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) VALUES ('{max_value}', '{column_name}', '{range_type.upper()}', '{order_name}', current_date(), NULL, NULL);"
                                     queries.append(query)
                 else:  # Regular inputs (Sub Industry, etc.)
                     # Add comment for the group
@@ -197,7 +197,7 @@ def main():
                                     type_value = 'EXC'
                                 else:
                                     continue
-                                query = f"INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) VALUES ('{value}', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);"
+                                query = f"INSERT INTO delivery_schema._sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) VALUES ('{value}', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);"
                                 queries.append(query)
 
         # Display queries
