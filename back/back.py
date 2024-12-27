@@ -62,7 +62,7 @@ def main():
         # Function to split values and handle escaping of quotes
         def split_and_escape(input_string):
             # Split by commas, but handle quoted sections
-            pattern = r'(?:"([^"]*)"|\'([^\']*)\'|([^,]+))'
+            pattern = r'(?:"([^"]*)"|\'([^\']*)\'|([^\n]+))'
             values = re.findall(pattern, input_string)
             processed_values = []
             for value in values:
