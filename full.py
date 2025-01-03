@@ -87,9 +87,9 @@ def main():
     def get_inputs(column_name):
         st.write(f"### {column_name}")
         # Get INC values
-        inc_inputs = st.text_area(f"Enter INC values for {column_name} (comma-separated or newline-separated):", key=f"{column_name}_inc")
+        inc_inputs = st.text_area(f"Enter INC values for {column_name} (newline-separated):", key=f"{column_name}_inc")
         # Get EXC values
-        exc_inputs = st.text_area(f"Enter EXC values for {column_name} (comma-separated or newline-separated):", key=f"{column_name}_exc")
+        exc_inputs = st.text_area(f"Enter EXC values for {column_name} (newline-separated):", key=f"{column_name}_exc")
 
         # Function to split values and handle escaping of quotes
         def split_and_escape(input_string):
