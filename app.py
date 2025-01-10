@@ -220,8 +220,18 @@ def main():
                                     continue
                                 # Special case for Job Title
                                 if column == "Job Title":
-                                    query = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`)
-                                    VALUES ('%{value}%', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);'''
+                                    normalized_value = re.sub(r'\.', '', value).upper()
+                                    if len(normalized_value) < 5:
+                                         # Generate queries for both '% {value} %' and '{value}%'
+                                        query1 = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) 
+                                        VALUES ('% {value} %', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);'''
+                                        query2 = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) 
+                                        VALUES ('{value}%', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);'''
+                                        queries.extend([query1, query2])
+                                        continue
+                                    else:
+                                        query = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`)
+                                        VALUES ('%{value}%', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);'''
                                 else:
                                     query = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) 
                                     VALUES ('{value}', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);'''
