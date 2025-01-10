@@ -15,6 +15,7 @@ def main():
     industry = st.sidebar.checkbox("Industry")
     sector = st.sidebar.checkbox("Sector")
     county = st.sidebar.checkbox("County")
+    country = st.sidebar.checkbox("Country")
     post_town = st.sidebar.checkbox("Post Town")
     post_code = st.sidebar.checkbox("Post Code")
     region = st.sidebar.checkbox("Region")
@@ -49,6 +50,11 @@ def main():
         "General", "Government", "Intern", "Junior", "Administration", "Student", "Uncategorised"
     ]
 
+    
+    # 
+    country_list = [
+        "England", "England/Wales", "Scotland", "Scotland/England", "United Kingdom", "Wales", "Wales/England", "Northern Ireland"
+    ]
     # Input fields for selected columns
     st.subheader("Inputs for Selected Columns")
     column_inputs = {}
@@ -79,7 +85,15 @@ def main():
         exc_values = split_and_escape(exc_inputs)
 
         return {"inc": inc_values, "exc": exc_values}
-
+    
+    
+    def get_country_inputs():
+        st.write("### Country")
+        inc_values = st.multiselect("Select INC values for Country:", country_list, key="Country_Inc")
+        exc_values = st.multiselect("Select EXC values for Country:", country_list, key="Country_Exc")
+        return {"inc": inc_values, "exc": exc_values}
+    
+    
     def get_range_inputs(column_name, range_values):
         st.write(f"### {column_name} - Range")
         # Select predefined ranges for INC and EXC
@@ -115,8 +129,13 @@ def main():
         column_inputs["Industry"] = get_inputs("Industry")
     if sector:
         column_inputs["Sector"] = get_inputs("Sector")
+        
+    if country:
+        column_inputs["Country"] = get_country_inputs() 
+        
     if county:
         column_inputs["County"] = get_inputs("County")
+        
     if post_town:
         column_inputs["Post Town"] = get_inputs("Post Town")
     if post_code:
@@ -175,11 +194,11 @@ def main():
                                 max_value = range_values.get('max', None)
                                 if min_value is not None and min_value != 0:
                                     # Generate a separate query for the MIN value
-                                    query = f"INSERT INTO delivery_schema.count_spec_template_updated (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) VALUES ('{min_value}', '{column_name}', '{range_type.upper()}', '{order_name}', current_date(), NULL, NULL);"
+                                    query = f"INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) VALUES ('{min_value}', '{column_name}', '{range_type.upper()}', '{order_name}', current_date(), NULL, NULL);"
                                     queries.append(query)
                                 if max_value is not None and max_value != 0:
                                     # Generate a separate query for the MAX value
-                                    query = f"INSERT INTO delivery_schema.count_spec_template_updated (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) VALUES ('{max_value}', '{column_name}', '{range_type.upper()}', '{order_name}', current_date(), NULL, NULL);"
+                                    query = f"INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) VALUES ('{max_value}', '{column_name}', '{range_type.upper()}', '{order_name}', current_date(), NULL, NULL);"
                                     queries.append(query)
                 else:  # Regular inputs (Sub Industry, etc.)
                     # Add comment for the group
@@ -197,7 +216,7 @@ def main():
                                     type_value = 'EXC'
                                 else:
                                     continue
-                                query = f"INSERT INTO delivery_schema.count_spec_template_updated (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) VALUES ('{value}', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);"
+                                query = f"INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) VALUES ('{value}', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);"
                                 queries.append(query)
 
         # Display queries
