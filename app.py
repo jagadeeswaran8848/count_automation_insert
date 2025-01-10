@@ -216,7 +216,11 @@ def main():
                                     type_value = 'EXC'
                                 else:
                                     continue
-                                query = f"INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) VALUES ('{value}', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);"
+                                # Special case for Job Title
+                                if column == "Job Title":
+                                    query = f"INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) VALUES ('%{value}%', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);"
+                                else:
+                                    query = f"INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) VALUES ('{value}', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);"
                                 queries.append(query)
 
         # Display queries
