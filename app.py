@@ -47,7 +47,7 @@ def main():
     # Job title levels
     job_title_levels = [
         "Manager", "Senior", "C level", "Company Secretary", "Director", "VP level", 
-        "General", "Government", "Intern", "Junior", "Administration", "Student", "Uncategorised"
+        "General", "Government", "Intern", "Junior", "Administration", "Student", "Uncategorised","NULL"
     ]
 
     
@@ -208,9 +208,6 @@ def main():
                     for range_type, values in inputs.items():
                         if values:
                             for value in values:
-                                # Skip if value is '0', 'NULL', or 'Uncategorised'
-                                if value == "0" or value == "NULL" or value == "Uncategorised":
-                                    continue
                                 # Determine whether the value is in "INC" or "EXC" section
                                 if range_type == 'inc':
                                     type_value = 'INC'
