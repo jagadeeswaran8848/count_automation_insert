@@ -103,10 +103,10 @@ def main():
 
     def get_min_max_range_inputs(column_name):
         st.write(f"### {column_name} - MIN and MAX Values")
-        min_inc = st.number_input(f"Enter MIN INC for {column_name}:", key=f"{column_name}_min_inc", min_value=0)
-        max_inc = st.number_input(f"Enter MAX INC for {column_name}:", key=f"{column_name}_max_inc", min_value=0)
-        min_exc = st.number_input(f"Enter MIN EXC for {column_name}:", key=f"{column_name}_min_exc", min_value=0)
-        max_exc = st.number_input(f"Enter MAX EXC for {column_name}:", key=f"{column_name}_max_exc", min_value=0)
+        min_inc = st.text_input(f"Enter MIN INC for {column_name}:", key=f"{column_name}_min_inc", min_value=0)
+        max_inc = st.text_input(f"Enter MAX INC for {column_name}:", key=f"{column_name}_max_inc", min_value=0)
+        min_exc = st.text_input(f"Enter MIN EXC for {column_name}:", key=f"{column_name}_min_exc", min_value=0)
+        max_exc = st.text_input(f"Enter MAX EXC for {column_name}:", key=f"{column_name}_max_exc", min_value=0)
         return {"inc": {"min": min_inc, "max": max_inc}, "exc": {"min": min_exc, "max": max_exc}}
 
     def get_sample_or_order_inputs(column_name):
