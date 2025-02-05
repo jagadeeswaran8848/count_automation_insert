@@ -9,11 +9,12 @@ def main():
     # Sidebar checkboxes
     st.sidebar.title("Select Columns")
     order_name = st.sidebar.text_input("Enter Order Name", key="order_name")  # New input for order_name
-    sample = st.sidebar.checkbox("Sample")
-    order = st.sidebar.checkbox("Order")
+    # sample = st.sidebar.checkbox("Sample")
+    # order = st.sidebar.checkbox("Order")
     sub_industry = st.sidebar.checkbox("Sub Industry")
     industry = st.sidebar.checkbox("Industry")
     sector = st.sidebar.checkbox("Sector")
+    Sic_code = st.sidebar.checkbox("SIC_CODE")
     county = st.sidebar.checkbox("County")
     country = st.sidebar.checkbox("Country")
     post_town = st.sidebar.checkbox("Post Town")
@@ -30,7 +31,6 @@ def main():
     job_title = st.sidebar.checkbox("Job Title")
     job_title_level = st.sidebar.checkbox("Job Title Level")
     
-
     # Employee range values (predefined)
     employee_ranges = [
         "1 to 5", "6 to 10", "11 to 19", "20 to 49", "50 to 99", "100 to 199", 
@@ -50,11 +50,11 @@ def main():
         "General", "Government", "Intern", "Junior", "Administration", "Student", "Uncategorised","NULL"
     ]
 
-    
-    # 
+    # Country list
     country_list = [
         "England", "England/Wales", "Scotland", "Scotland/England", "United Kingdom", "Wales", "Wales/England", "Northern Ireland"
     ]
+    
     # Input fields for selected columns
     st.subheader("Inputs for Selected Columns")
     column_inputs = {}
@@ -86,13 +86,11 @@ def main():
 
         return {"inc": inc_values, "exc": exc_values}
     
-    
     def get_country_inputs():
         st.write("### Country")
         inc_values = st.multiselect("Select INC values for Country:", country_list, key="Country_Inc")
         exc_values = st.multiselect("Select EXC values for Country:", country_list, key="Country_Exc")
         return {"inc": inc_values, "exc": exc_values}
-    
     
     def get_range_inputs(column_name, range_values):
         st.write(f"### {column_name} - Range")
@@ -102,12 +100,17 @@ def main():
         return {"inc": inc_selected, "exc": exc_selected}
 
     def get_min_max_range_inputs(column_name):
-        st.write(f"### {column_name} - MIN and MAX Values")
-        min_inc = st.text_input(f"Enter MIN INC for {column_name}:", key=f"{column_name}_min_inc")
-        max_inc = st.text_input(f"Enter MAX INC for {column_name}:", key=f"{column_name}_max_inc")
-        min_exc = st.text_input(f"Enter MIN EXC for {column_name}:", key=f"{column_name}_min_exc")
-        max_exc = st.text_input(f"Enter MAX EXC for {column_name}:", key=f"{column_name}_max_exc")
-        return {"inc": {"min": min_inc, "max": max_inc}, "exc": {"min": min_exc, "max": max_exc}}
+        st.write(f"### {column_name} - Comma-Separated Values")
+        inc_values = st.text_input(f"Enter comma-separated values for {column_name} (INC):", key=f"{column_name}_inc")
+        exc_values = st.text_input(f"Enter comma-separated values for {column_name} (EXC):", key=f"{column_name}_exc")
+
+        def parse_values(input_string):
+            return [value.strip() for value in input_string.split(",") if value.strip()]
+
+        inc_values_list = parse_values(inc_values)
+        exc_values_list = parse_values(exc_values)
+
+        return {"inc": inc_values_list, "exc": exc_values_list}
 
     def get_sample_or_order_inputs(column_name):
         st.write(f"### {column_name}")
@@ -121,15 +124,17 @@ def main():
         exc_values = st.multiselect("Select EXC values for Job Title Level:", job_title_levels, key="job_title_level_exc")
         return {"inc": inc_values, "exc": exc_values}
 
-    if sample:
-        column_inputs["Sample"] = get_sample_or_order_inputs("Sample")
+    # if sample:
+    #     column_inputs["Sample"] = get_sample_or_order_inputs("Sample")
     if sub_industry:
         column_inputs["Sub Industry"] = get_inputs("Sub Industry")
     if industry:
         column_inputs["Industry"] = get_inputs("Industry")
     if sector:
         column_inputs["Sector"] = get_inputs("Sector")
-        
+    if Sic_code:
+        column_inputs["SIC_CODE"] = get_inputs("SIC_CODE")
+                
     if country:
         column_inputs["Country"] = get_country_inputs() 
         
@@ -162,8 +167,8 @@ def main():
         column_inputs["Job Title"] = get_inputs("Job Title")
     if job_title_level:
         column_inputs["Job Title Level"] = get_job_title_level_inputs()  # Use the multi-select for job title level
-    if order:
-        column_inputs["Order"] = get_sample_or_order_inputs("Order")
+    # if order:
+    #     column_inputs["Order"] = get_sample_or_order_inputs("Order")
 
     # Button to generate queries
     if st.button("Generate Insert Queries"):
@@ -181,58 +186,58 @@ def main():
             # Convert column name to lowercase and replace spaces with underscores
             column_name = column.lower().replace(" ", "_")
 
-            # if isinstance(inputs, dict):
-            #     if 'min' in inputs['inc']:  # Range inputs (Employees, Turnover, Company Age)
-            #         # Only handle range columns like Employees, Turnover, Company Age
-            #         if column in ["Employees", "Turnover", "Company Age"]:
-            #             # Add comment for the group
-            #             queries.append(f"-- Insert queries for {column_name} (Range)")
-            #             for range_type in ['inc', 'exc']:
-            #                 range_values = inputs[range_type]
-            #                 if isinstance(range_values, dict):  # This is for min/max range inputs
-            #                     min_value = range_values.get('min', None)
-            #                     max_value = range_values.get('max', None)
-            #                     if min_value is not None and min_value != 0:
-            #                         # Generate a separate query for the MIN value
-            #                         query = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) 
-            #                         VALUES ('{min_value}', '{column_name}', '{range_type.upper()}', '{order_name}', current_date(), NULL, NULL);'''
-            #                         queries.append(query)
-            #                     if max_value is not None and max_value != 0:
-            #                         # Generate a separate query for the MAX value
-            #                         query = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) 
-            #                         VALUES ('{max_value}', '{column_name}', '{range_type.upper()}', '{order_name}', current_date(), NULL, NULL);'''
-            #                         queries.append(query)
-            #     else:  # Regular inputs (Sub Industry, etc.)
+            if isinstance(inputs, dict):
+                if 'min' in inputs['inc']:  # Range inputs (Employees, Turnover, Company Age)
+                    # Only handle range columns like Employees, Turnover, Company Age
+                    if column in ["Employees", "Turnover", "Company Age"]:
+                        # Add comment for the group
+                        queries.append(f"-- Insert queries for {column_name} (Range)")
+                        for range_type in ['inc', 'exc']:
+                            range_values = inputs[range_type]
+                            if isinstance(range_values, dict):  # This is for min/max range inputs
+                                min_value = range_values.get('min', None)
+                                max_value = range_values.get('max', None)
+                                if min_value is not None and min_value != 0:
+                                    # Generate a separate query for the MIN value
+                                    query = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) 
+                                    VALUES ('{min_value}', '{column_name}', '{range_type.upper()}', '{order_name}', current_date(), NULL, NULL);'''
+                                    queries.append(query)
+                                if max_value is not None and max_value != 0:
+                                    # Generate a separate query for the MAX value
+                                    query = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) 
+                                    VALUES ('{max_value}', '{column_name}', '{range_type.upper()}', '{order_name}', current_date(), NULL, NULL);'''
+                                    queries.append(query)
+                else:  # Regular inputs (Sub Industry, etc.)
                     # Add comment for the group
-            queries.append(f"-- Insert queries for {column_name}")
-            for range_type, values in inputs.items():
-                if values:
-                    for value in values:
-                        # Determine whether the value is in "INC" or "EXC" section
-                        if range_type == 'inc':
-                            type_value = 'INC'
-                        elif range_type == 'exc':
-                            type_value = 'EXC'
-                        else:
-                            continue
-                        # Special case for Job Title
-                        if column == "Job Title":
-                            normalized_value = re.sub(r'\.', '', value).upper()
-                            if len(normalized_value) < 5:
-                                    # Generate queries for both '% {value} %' and '{value}%'
-                                query1 = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) 
-                                VALUES ('% {value} %', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);'''
-                                query2 = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) 
-                                VALUES ('{value}%', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);'''
-                                queries.extend([query1, query2])
-                                continue
-                            else:
-                                query = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`)
-                                VALUES ('%{value}%', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);'''
-                        else:
-                            query = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) 
-                            VALUES ('{value}', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);'''
-                        queries.append(query)
+                    queries.append(f"-- Insert queries for {column_name}")
+                    for range_type, values in inputs.items():
+                        if values:
+                            for value in values:
+                                # Determine whether the value is in "INC" or "EXC" section
+                                if range_type == 'inc':
+                                    type_value = 'INC'
+                                elif range_type == 'exc':
+                                    type_value = 'EXC'
+                                else:
+                                    continue
+                                # Special case for Job Title
+                                if column == "Job Title":
+                                    normalized_value = re.sub(r'\.', '', value).upper()
+                                    if len(normalized_value) < 5:
+                                         # Generate queries for both '% {value} %' and '{value}%'
+                                        query1 = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) 
+                                        VALUES ('% {value} %', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);'''
+                                        query2 = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) 
+                                        VALUES ('{value} %', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);'''
+                                        queries.extend([query1, query2])
+                                        continue
+                                    else:
+                                        query = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`)
+                                        VALUES ('%{value}%', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);'''
+                                else:
+                                    query = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) 
+                                    VALUES ('{value}', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);'''
+                                queries.append(query)
 
         # Display queries
         if queries:
@@ -241,4 +246,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
