@@ -11,6 +11,7 @@ def main():
     order_name = st.sidebar.text_input("Enter Order Name", key="order_name")  # New input for order_name
     # sample = st.sidebar.checkbox("Sample")
     # order = st.sidebar.checkbox("Order")
+    company_name = st.sidebar.checkbox("Company Name")
     sub_industry = st.sidebar.checkbox("Sub Industry")
     industry = st.sidebar.checkbox("Industry")
     sector = st.sidebar.checkbox("Sector")
@@ -126,6 +127,8 @@ def main():
 
     # if sample:
     #     column_inputs["Sample"] = get_sample_or_order_inputs("Sample")
+    if company_name:
+        column_inputs["Company Name"] = get_inputs("Company Name")
     if sub_industry:
         column_inputs["Sub Industry"] = get_inputs("Sub Industry")
     if industry:
@@ -230,6 +233,18 @@ def main():
                                         query2 = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) 
                                         VALUES ('{value} %', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);'''
                                         queries.extend([query1, query2])
+                                        continue
+                                    else:
+                                        query = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`)
+                                        VALUES ('%{value}%', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);'''
+                                    # Special case for Company Name
+                                elif column == "Company Name":
+                                    normalized_value = re.sub(r'\.', '', value).upper()
+                                    if len(normalized_value) < 5:
+                                         # Generate queries for both '% {value} %' and '{value}%'
+                                        query1 = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`) 
+                                        VALUES ('% {value}%', '{column_name}', '{type_value}', '{order_name}', current_date(), NULL, NULL);'''
+                                        queries.append(query1)
                                         continue
                                     else:
                                         query = f'''INSERT INTO delivery_schema.count_spec_template_updated_sample (`values`, `attribute`, `type`, `order_name`, `load_date`, `status`, `completed_status`)
